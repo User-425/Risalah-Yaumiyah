@@ -1,17 +1,17 @@
 import React, { useEffect, useState } from 'react';
-import { StyleSheet, View, Text, Image, Dimensions, ScrollView, TouchableOpacity } from 'react-native';
+import { StyleSheet, View, Text, Image,Dimensions, ScrollView, TouchableOpacity } from 'react-native';
 import { Colors, Typography, Card } from 'react-native-ui-lib';
 import Carousel from 'react-native-snap-carousel';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import moment from 'moment';
 import Header from '../../components/Header';
+import { useRouter } from 'expo-router';
 
 import 'moment/locale/id';
 import 'moment-hijri';
 
 import ContentList from '../../components/ContentList';
-import content from '../../assets/data/content.json';
-
+import { getContents, Content } from '../../modules/contentModule';
 
 const { width: viewportWidth } = Dimensions.get('window');
 
@@ -52,7 +52,8 @@ const Home = () => {
   const [currentDate, setCurrentDate] = useState('');
   const [currentHijriDate, setCurrentHijriDate] = useState('');
 
-  const [contents, setContents] = useState([]);
+  const [contents, setContents] = useState<Content[]>([]);
+  const router = useRouter();
 
   useEffect(() => {
     const intervalId = setInterval(() => {
@@ -64,6 +65,14 @@ const Home = () => {
 
     return () => clearInterval(intervalId);
   }, []);
+
+  useEffect(() => {
+    setContents(getContents());
+  }, []);
+
+  const handleSelect = (id: number) => {
+    router.push(`reader/${id}`);
+  };
 
   return (
     <View style={styles.container}>
