@@ -11,8 +11,10 @@ const TabBarIcon = ({ name, color }) => {
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
-  const activeTintColor = Colors[colorScheme ?? 'light'].tint;
-  const inactiveTintColor = Colors[colorScheme ?? 'light'].tabIconDefault;
+  // const activeTintColor = Colors[colorScheme ?? 'light'].tint;
+  // const inactiveTintColor = Colors[colorScheme ?? 'light'].tabIconDefault;
+  const activeTintColor = Colors['light'].tint;
+  const inactiveTintColor = Colors['light'].tabIconDefault;
 
   return (
     <Tabs
@@ -43,9 +45,9 @@ export default function TabLayout() {
 
 const tabScreens = [
   { name: 'index', title: 'Beranda', icon: 'home' },
-  { name: 'bookmark', title: 'Bookmark', icon: 'bookmarks' },
-  { name: 'tools', title: 'Alat', icon: 'build' },
-  { name: 'setting', title: 'Pengaturan', icon: 'settings' },
+  { name: 'bookmark', title: 'Bookmark', icon: 'bookmark-multiple' },
+  { name: 'alat', title: 'Alat', icon: 'toolbox' },
+  { name: 'setting', title: 'Pengaturan', icon: 'cog' },
 ];
 
 const styles = StyleSheet.create({
