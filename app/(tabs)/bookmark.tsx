@@ -1,74 +1,40 @@
 import React from 'react';
-import { StyleSheet, View, Text, Image, Dimensions, ScrollView, TouchableOpacity } from 'react-native';
-import { Colors, Typography, Card } from 'react-native-ui-lib';
-import Carousel from 'react-native-snap-carousel';
+import { View, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
+import { Text, Colors, Card, Button } from 'react-native-ui-lib';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
-const { width: viewportWidth } = Dimensions.get('window');
-
-const carouselItems = [
-  { title: 'Beautiful Beach', image: require('@/assets/images/image_1.jpg') },
-  { title: 'Mountain View', image: require('@/assets/images/image_2.jpg') },
-  { title: 'Cityscape', image: require('@/assets/images/image_3.jpg') },
+const bookmarks = [
+  { id: '1', title: 'Al-Fatiha', description: 'The Opening' },
+  { id: '2', title: 'Al-Baqara', description: 'The Cow' },
+  { id: '3', title: 'Al-Ikhlas', description: 'The Purity' },
+  // Add more bookmarks as needed
 ];
 
-const popularDestinations = [
-  { name: 'Paris', image: require('@/assets/images/image_1.jpg') },
-  { name: 'New York', image: require('@/assets/images/image_2.jpg') },
-  { name: 'Tokyo', image: require('@/assets/images/image_3.jpg') },
-];
+const BookmarkScreen = () => {
+  const renderItem = ({ item }) => (
+    <Card style={styles.card}>
+      <View style={styles.cardContent}>
+        <Icon name="bookmark" size={30} color={Colors.blue30} />
+        <View style={styles.textContainer}>
+          <Text style={styles.title}>{item.title}</Text>
+          <Text style={styles.description}>{item.description}</Text>
+        </View>
+        <TouchableOpacity>
+          <Icon name="delete" size={30} color={Colors.red30} />
+        </TouchableOpacity>
+      </View>
+    </Card>
+  );
 
-const featuredIcons = [
-  { title: 'Hotels', icon: 'hotel' },
-  { title: 'Flights', icon: 'flight' },
-  { title: 'Car Rentals', icon: 'directions-car' },
-  { title: 'Experiences', icon: 'local-activity' },
-  { title: 'Restaurants', icon: 'restaurant' },
-  { title: 'More', icon: 'more-horiz' },
-];
-
-const renderCarouselItem = ({ item
-}) => (
-  <View style={styles.carouselItem}>
-    <Image source={item.image} style={styles.carouselImage} />
-    <Text style={styles.carouselTitle}>{item.title}</Text>
-  </View>
-);
-
-const Home = () => {
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
-        <Icon name="menu" size={30} color={Colors.black} />
-        <Text style={styles.headerTitle}>Explore</Text>
-        <Icon name="search" size={30} color={Colors.black} />
-      </View>
-      <ScrollView>
-        <Carousel
-          data={carouselItems}
-          renderItem={renderCarouselItem}
-          sliderWidth={viewportWidth}
-          itemWidth={viewportWidth * 0.8}
-          loop={true}
-        />
-        <View style={styles.featuredGrid}>
-          {featuredIcons.map((item, index) => (
-            <TouchableOpacity key={index} style={styles.iconButton}>
-              <Icon name={item.icon} size={40} color={Colors.blue30} />
-              <Text style={styles.iconTitle}>{item.title}</Text>
-            </TouchableOpacity>
-          ))}
-        </View>
-        <Text style={styles.sectionTitle}>Popular Destinations</Text>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-          {popularDestinations.map((destination, index) => (
-            <Card key={index} style={styles.card}>
-              <Image source={destination.image} style={styles.cardImage} />
-              <Text style={styles.cardTitle}>{destination.name}</Text>
-            </Card>
-          ))}
-        </ScrollView>
-      </ScrollView>
+      <Text style={styles.header}>Bookmarks</Text>
+      <FlatList
+        data={bookmarks}
+        renderItem={renderItem}
+        keyExtractor={(item) => item.id}
+        contentContainerStyle={styles.listContainer}
+      />
     </View>
   );
 };
@@ -77,67 +43,38 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: Colors.white,
+    padding: 16,
   },
   header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: 20,
-    paddingTop: 40,
-    paddingBottom: 20,
-  },
-  headerTitle: {
-    ...Typography.text40,
+    fontSize: 24,
     fontWeight: 'bold',
+    marginBottom: 16,
   },
-  carouselItem: {
-    borderRadius: 8,
-    overflow: 'hidden',
-  },
-  carouselImage: {
-    width: '100%',
-    height: 200,
-  },
-  carouselTitle: {
-    ...Typography.text60,
-    color: Colors.white,
-    position: 'absolute',
-    bottom: 10,
-    left: 10,
-  },
-  sectionTitle: {
-    ...Typography.text50,
-    paddingHorizontal: 20,
-    paddingTop: 20,
+  listContainer: {
+    paddingBottom: 16,
   },
   card: {
-    margin: 10,
+    padding: 16,
+    marginBottom: 16,
     borderRadius: 8,
-    overflow: 'hidden',
+    backgroundColor: Colors.grey60,
   },
-  cardImage: {
-    width: 150,
-    height: 150,
-  },
-  cardTitle: {
-    ...Typography.text70,
-    padding: 10,
-  },
-  featuredGrid: {
+  cardContent: {
     flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'space-around',
-    paddingVertical: 20,
-  },
-  iconButton: {
     alignItems: 'center',
-    margin: 10,
-    width: viewportWidth / 3 - 20,
   },
-  iconTitle: {
-    ...Typography.text80,
-    marginTop: 10,
+  textContainer: {
+    flex: 1,
+    marginLeft: 16,
+  },
+  title: {
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+  description: {
+    fontSize: 14,
+    color: Colors.grey40,
   },
 });
 
-export default Home;
+export default BookmarkScreen;

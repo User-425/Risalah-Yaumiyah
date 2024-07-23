@@ -1,56 +1,66 @@
-  import React from 'react';
-  import { Tabs } from 'expo-router';
-  import { TabBarIcon } from '@/components/navigation/TabBarIcon';
-  import { Colors } from '@/constants/Colors';
-  import { useColorScheme } from '@/hooks/useColorScheme';
-  
+import React from 'react';
+import { Tabs } from 'expo-router';
+import { Colors } from '@/constants/Colors';
+import { useColorScheme } from '@/hooks/useColorScheme';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import { StyleSheet } from 'react-native';
 
-  export default function TabLayout() {
-    const colorScheme = useColorScheme();
+const TabBarIcon = ({ name, color }) => {
+  return <Icon name={name} size={28} color={color} />;
+};
 
-    return (
-      <Tabs
-        screenOptions={{
-          tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
-          headerShown: false,
-        }}
-      >
+export default function TabLayout() {
+  const colorScheme = useColorScheme();
+  const activeTintColor = Colors[colorScheme ?? 'light'].tint;
+  const inactiveTintColor = Colors[colorScheme ?? 'light'].tabIconDefault;
+
+  return (
+    <Tabs
+      screenOptions={{
+        tabBarActiveTintColor: activeTintColor,
+        tabBarInactiveTintColor: inactiveTintColor,
+        tabBarStyle: styles.tabBar,
+        tabBarLabelStyle: styles.tabBarLabel,
+        tabBarIconStyle: styles.tabBarIcon,
+        headerShown: false,
+      }}
+    >
+      {tabScreens.map((screen, index) => (
         <Tabs.Screen
-          name="index"
+          key={index}
+          name={screen.name}
           options={{
-            title: 'Beranda',
+            title: screen.title,
             tabBarIcon: ({ color, focused }) => (
-              <TabBarIcon name={focused ? 'home' : 'home-outline'} color={color} />
+              <TabBarIcon name={focused ? screen.icon : `${screen.icon}-outline`} color={color} />
             ),
           }}
         />
-        <Tabs.Screen
-          name="bookmark"
-          options={{
-            title: 'Bookmark',
-            tabBarIcon: ({ color, focused }) => (
-              <TabBarIcon name={focused ? 'bookmark' : 'bookmark-outline'} color={color} />
-            ),
-          }}
-        />
-        <Tabs.Screen
-          name="alat"
-          options={{
-            title: 'Alat',
-            tabBarIcon: ({ color, focused }) => (
-              <TabBarIcon name={focused ? 'construct' : 'construct-outline'} color={color} />
-            ),
-          }}
-        />
-        <Tabs.Screen
-          name="setting"
-          options={{
-            title: 'Pengaturan',
-            tabBarIcon: ({ color, focused }) => (
-              <TabBarIcon name={focused ? 'settings' : 'settings-outline'} color={color} />
-            ),
-          }}
-        />
-      </Tabs>
-    );
-  }
+      ))}
+    </Tabs>
+  );
+}
+
+const tabScreens = [
+  { name: 'index', title: 'Beranda', icon: 'home' },
+  { name: 'bookmark', title: 'Bookmark', icon: 'bookmarks' },
+  { name: 'tools', title: 'Alat', icon: 'build' },
+  { name: 'setting', title: 'Pengaturan', icon: 'settings' },
+];
+
+const styles = StyleSheet.create({
+  tabBar: {
+    backgroundColor: Colors.light.background,
+    borderTopWidth: 0,
+    elevation: 10,
+    height: 60,
+  },
+  tabBarLabel: {
+    fontSize: 12,
+    fontWeight: '600',
+    paddingBottom: 5,
+  },
+  tabBarIcon: {
+    marginTop: 5,
+  },
+});

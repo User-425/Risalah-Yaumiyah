@@ -1,12 +1,22 @@
 [
     {
         "id": 1,
-        "title": "Hello",
-        "text": "Hello world!"
+        "title": "Isthighosah",
+        "text": "[Bacaan Isthighosah]"
     },
     {
         "id": 2,
-        "title": "Lorem Ipsum",
-        "text": "Lorem Ipsum."
+        "title": "Tahlil",
+        "text": "[Bacaan Tahlil]."
+    },
+    {
+        "id": 3,
+        "title": "Dziba'",
+        "text": "[Bacaan Dziba']."
+    },
+    {
+        "id": 4,
+        "title": "Yasin Fadhilah",
+        "text": "[Bacaan Fadhilah]."
     }
 ]

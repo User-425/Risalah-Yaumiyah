@@ -33,13 +33,6 @@ const featuredIcons = [
   { title: 'Kalender', icon: 'calendar-today' },
 ];
 
-const textItems = [
-  { title: 'Istighosah' },
-  { title: 'Tahlil' },
-  { title: 'Dziba\'' },
-  { title: 'Bacaan ' },
-];
-
 const renderCarouselItem = ({ item }) => (
   <View style={styles.carouselItem}>
     <Image source={item.image} style={styles.carouselImage} />
@@ -110,16 +103,7 @@ const Home = () => {
           ))}
         </ScrollView>
         <Text style={styles.sectionTitle}>More Items</Text>
-        <View style={styles.textItemList}>
-          {textItems.map((item, index) => (
-            <TouchableOpacity key={index} style={styles.textItem}>
-              <Text style={styles.textItemTitle}>{item.title}</Text>
-            </TouchableOpacity>
-          ))}
-        </View>
-        <View style={styles.container}>
-          <ContentList contents={contents} onSelect={handleSelect} />
-        </View>
+        <ContentList contents={contents} onSelect={handleSelect} />
       </ScrollView>
     </View>
   );
