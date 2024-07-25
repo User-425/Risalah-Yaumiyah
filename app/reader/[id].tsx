@@ -3,11 +3,13 @@ import { View, Text, StyleSheet, ActivityIndicator, ScrollView } from 'react-nat
 import ContentReader from '../../components/ContentReader';
 import { getContentById, Content } from '../../modules/contentModule';
 import { useLocalSearchParams } from 'expo-router';
+import { useNavigation } from '@react-navigation/native';
 
 const ReaderScreen = () => {
   const { id } = useLocalSearchParams();
   const [content, setContent] = useState<Content | undefined>(undefined);
   const [loading, setLoading] = useState(true);
+  const navigation = useNavigation();
 
   useEffect(() => {
     if (id) {
@@ -16,6 +18,14 @@ const ReaderScreen = () => {
       setLoading(false);
     }
   }, [id]);
+
+  useEffect(() => {
+    if (content) {
+      navigation.setOptions({
+        title: content.title || 'Reader',
+      });
+    }
+  }, [content]);
 
   if (loading) {
     return (
