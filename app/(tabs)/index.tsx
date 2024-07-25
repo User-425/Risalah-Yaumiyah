@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { StyleSheet, View, Text, Image,Dimensions, ScrollView, TouchableOpacity } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { StyleSheet, View, Text, Image, Dimensions, ScrollView, TouchableOpacity } from 'react-native';
 import { Colors, Typography, Card } from 'react-native-ui-lib';
 import Carousel from 'react-native-snap-carousel';
-import Icon from 'react-native-vector-icons/MaterialIcons';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import moment from 'moment';
 import Header from '../../components/Header';
 import { useRouter } from 'expo-router';
@@ -19,12 +20,6 @@ const carouselItems = [
   { title: 'Beautiful Beach', image: require('@/assets/images/image_1.jpg') },
   { title: 'Do\'a Sehari-hari', image: require('@/assets/images/doa.jpg') },
   { title: 'Alqur\'an', image: require('@/assets/images/alquran.png') },
-];
-
-const recentOpened = [
-  { name: 'Istighosah' },
-  { name: 'Yasin Fadhilah' },
-  { name: 'Do\'a Setelah Adzan' },
 ];
 
 const featuredIcons = [
@@ -46,6 +41,7 @@ const Home = () => {
   const [currentHijriDate, setCurrentHijriDate] = useState('');
 
   const [contents, setContents] = useState<Content[]>([]);
+  const [recentlyOpened, setRecentlyOpened] = useState<Content[]>([]);
   const router = useRouter();
 
   useEffect(() => {
@@ -63,8 +59,25 @@ const Home = () => {
     setContents(getContents());
   }, []);
 
-  const handleSelect = (id: number) => {
+  useEffect(() => {
+    const loadRecentlyOpened = async () => {
+      const storedData = await AsyncStorage.getItem('recentlyOpened');
+      if (storedData) {
+        setRecentlyOpened(JSON.parse(storedData));
+      }
+    };
+
+    loadRecentlyOpened();
+  }, []);
+
+  const handleSelect = async (id: number) => {
     router.push(`reader/${id}`);
+    const selectedItem = contents.find(content => content.id === id);
+    if (selectedItem) {
+      const updatedRecentlyOpened = [selectedItem, ...recentlyOpened.filter(item => item.id !== id)];
+      setRecentlyOpened(updatedRecentlyOpened);
+      await AsyncStorage.setItem('recentlyOpened', JSON.stringify(updatedRecentlyOpened));
+    }
   };
 
   return (
@@ -76,7 +89,7 @@ const Home = () => {
         <View style={styles.timeContainer}>
           <Text style={styles.timeText}>{currentTime}</Text>
           <Text style={styles.dateText}>{currentDate}</Text>
-          <Text style={styles.hijriDateText}>(tanggal hijriyah)</Text>
+          <Text style={styles.hijriDateText}>{currentHijriDate}</Text>
         </View>
         <Carousel
           data={carouselItems}
@@ -96,9 +109,9 @@ const Home = () => {
         </View>
         <Text style={styles.sectionTitle}>Baru Dibuka</Text>
         <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-          {recentOpened.map((destination, index) => (
-            <Card key={index} style={styles.card}>
-              <Text style={styles.cardTitle}>{destination.name}</Text>
+          {recentlyOpened.map((item, index) => (
+            <Card key={index} style={styles.card} onPress={() => handleSelect(item.id)}>
+              <Text style={styles.cardTitle}>{item.title}</Text>
             </Card>
           ))}
         </ScrollView>

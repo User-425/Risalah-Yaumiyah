@@ -3,10 +3,12 @@ import { StyleSheet, View, Text, ScrollView, TouchableOpacity } from 'react-nati
 import { Colors, Typography, Card, Switch, ListItem } from 'react-native-ui-lib';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import Header from '../../components/Header';
+import { useRouter } from 'expo-router';
 
 const SettingsScreen = () => {
   const [isNotificationsEnabled, setNotificationsEnabled] = React.useState(false);
   const [isDarkModeEnabled, setDarkModeEnabled] = React.useState(false);
+  
 
   return (
     <View style={styles.container}>
