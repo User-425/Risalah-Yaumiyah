@@ -10,6 +10,12 @@ const SettingsScreen = () => {
   const [isDarkModeEnabled, setDarkModeEnabled] = React.useState(false);
   
 
+  const router = useRouter();
+
+  const handleSelect = () => {
+    router.push(`about`);
+  };
+
   return (
     <View style={styles.container}>
       <View>
@@ -50,7 +56,7 @@ const SettingsScreen = () => {
             <Icon name="chevron-right" size={24} color={Colors.grey40} />
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.item}>
+          <TouchableOpacity style={styles.item} onPress={handleSelect}>
             <Icon name="info-outline" size={24} color={Colors.blue30} />
             <View style={styles.itemContent}>
               <Text style={styles.itemTitle}>Tentang</Text>
