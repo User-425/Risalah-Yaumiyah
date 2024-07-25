@@ -3,10 +3,17 @@ import { StyleSheet, View, Text, ScrollView, TouchableOpacity } from 'react-nati
 import { Colors, Typography, Card, Switch, ListItem } from 'react-native-ui-lib';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import Header from '../../components/Header';
+import { useRouter } from 'expo-router';
 
 const SettingsScreen = () => {
   const [isNotificationsEnabled, setNotificationsEnabled] = React.useState(false);
   const [isDarkModeEnabled, setDarkModeEnabled] = React.useState(false);
+
+  const router = useRouter();
+
+  const handleSelect = () => {
+    router.push(`about`);
+  };
 
   return (
     <View style={styles.container}>
@@ -48,7 +55,7 @@ const SettingsScreen = () => {
             <Icon name="chevron-right" size={24} color={Colors.grey40} />
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.item}>
+          <TouchableOpacity style={styles.item} onPress={handleSelect}>
             <Icon name="info-outline" size={24} color={Colors.blue30} />
             <View style={styles.itemContent}>
               <Text style={styles.itemTitle}>Tentang</Text>
