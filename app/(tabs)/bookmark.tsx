@@ -1,39 +1,58 @@
-import React from 'react';
-import { View, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
-import { Text, Colors, Card, Button } from 'react-native-ui-lib';
-import Icon from 'react-native-vector-icons/MaterialIcons';
-
-const bookmarks = [
-  { id: '1', title: 'Al-Fatiha', description: 'The Opening' },
-  { id: '2', title: 'Al-Baqara', description: 'The Cow' },
-  { id: '3', title: 'Al-Ikhlas', description: 'The Purity' },
-  // Add more bookmarks as needed
-];
+import React, { useState, useCallback } from 'react';
+import { View, Text, FlatList, StyleSheet, TouchableOpacity, RefreshControl } from 'react-native';
+import { getBookmarks } from '../../modules/bookmarkModule';
+import { getContentById, Content } from '../../modules/contentModule';
+import { useRouter } from 'expo-router';
+import { useFocusEffect } from '@react-navigation/native';
 
 const BookmarkScreen = () => {
-  const renderItem = ({ item }) => (
-    <Card style={styles.card}>
-      <View style={styles.cardContent}>
-        <Icon name="bookmark" size={30} color={Colors.blue30} />
-        <View style={styles.textContainer}>
-          <Text style={styles.title}>{item.title}</Text>
-          <Text style={styles.description}>{item.description}</Text>
-        </View>
-        <TouchableOpacity>
-          <Icon name="delete" size={30} color={Colors.red30} />
-        </TouchableOpacity>
-      </View>
-    </Card>
+  const [bookmarkedContent, setBookmarkedContent] = useState<Content[]>([]);
+  const [refreshing, setRefreshing] = useState(false);
+  const router = useRouter();
+
+  const fetchBookmarkedContent = async () => {
+    setRefreshing(true);
+    try {
+      const bookmarks = await getBookmarks();
+      const contentList = bookmarks.map(id => getContentById(Number(id)));
+      setBookmarkedContent(contentList);
+    } catch (error) {
+      console.error('Failed to fetch bookmarks:', error);
+    } finally {
+      setRefreshing(false);
+    }
+  };
+
+  useFocusEffect(
+    useCallback(() => {
+      fetchBookmarkedContent();
+    }, [])
   );
+
+  const handleRefresh = () => {
+    fetchBookmarkedContent();
+  };
+
+  const handlePress = (id: number) => {
+    router.push(`reader/${id}`);
+  };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.header}>Bookmarks</Text>
+      <Text style={styles.title}>Bookmarked Content</Text>
       <FlatList
-        data={bookmarks}
-        renderItem={renderItem}
-        keyExtractor={(item) => item.id}
-        contentContainerStyle={styles.listContainer}
+        data={bookmarkedContent}
+        keyExtractor={item => item.id.toString()}
+        renderItem={({ item }) => (
+          <TouchableOpacity onPress={() => handlePress(item.id)}>
+            <View style={styles.item}>
+              <Text>{item.title}</Text>
+            </View>
+          </TouchableOpacity>
+        )}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
+        }
       />
     </View>
   );
@@ -42,38 +61,19 @@ const BookmarkScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.white,
-    padding: 16,
-  },
-  header: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 16,
-  },
-  listContainer: {
-    paddingBottom: 16,
-  },
-  card: {
-    padding: 16,
-    marginBottom: 16,
-    borderRadius: 8,
-    backgroundColor: Colors.grey60,
-  },
-  cardContent: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  textContainer: {
-    flex: 1,
-    marginLeft: 16,
+    padding: 20,
+    backgroundColor: '#f5f5f5',
   },
   title: {
-    fontSize: 18,
+    fontSize: 24,
     fontWeight: 'bold',
+    marginBottom: 20,
   },
-  description: {
-    fontSize: 14,
-    color: Colors.grey40,
+  item: {
+    padding: 15,
+    marginBottom: 10,
+    backgroundColor: '#fff',
+    borderRadius: 8,
   },
 });
 
