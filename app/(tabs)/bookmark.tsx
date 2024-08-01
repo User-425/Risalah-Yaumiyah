@@ -39,7 +39,7 @@ const BookmarkScreen = () => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Bookmarked Content</Text>
+      <Text style={styles.title}>Bookmarked</Text>
       <FlatList
         data={bookmarkedContent}
         keyExtractor={item => item.id.toString()}
