@@ -45,6 +45,7 @@ export default function TabLayout() {
 
 const tabScreens = [
   { name: 'index', title: 'Beranda', icon: 'home' },
+  { name: 'quran', title: 'Al-Quran', icon: 'book' },
   { name: 'bookmark', title: 'Bookmark', icon: 'bookmark-multiple' },
   { name: 'alat', title: 'Alat', icon: 'toolbox' },
   { name: 'setting', title: 'Pengaturan', icon: 'cog' },
