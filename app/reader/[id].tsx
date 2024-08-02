@@ -25,7 +25,7 @@ const ReaderScreen = () => {
 
       const checkBookmark = async () => {
         const bookmarks = await getBookmarks();
-        setIsBookmarked(bookmarks.includes(id));
+        setIsBookmarked(bookmarks.some(bookmark => bookmark.id === Number(id) && bookmark.type === 'other'));
       };
       checkBookmark();
     }
@@ -33,9 +33,9 @@ const ReaderScreen = () => {
 
   const handleBookmarkToggle = async () => {
     if (isBookmarked) {
-      await removeBookmark(id);
+      await removeBookmark(Number(id),'other');
     } else {
-      await saveBookmark(id);
+      await saveBookmark(Number(id),'other');
     }
     setIsBookmarked(!isBookmarked);
   };
@@ -49,9 +49,9 @@ const ReaderScreen = () => {
         },
         headerTitleStyle: {
           fontWeight: 'bold',
-          color: '#fff', 
+          color: '#fff',
         },
-        headerTintColor: '#fff', 
+        headerTintColor: '#fff',
         headerRight: () => (
           <TouchableOpacity onPress={handleBookmarkToggle} style={styles.headerRightButton}>
             <Icon
@@ -63,7 +63,7 @@ const ReaderScreen = () => {
         ),
       });
     }
-  }, [navigation, content, isBookmarked]);
+  }, [navigation, content, isBookmarked, id]);
 
   if (loading) {
     return (
@@ -116,6 +116,9 @@ const styles = StyleSheet.create({
     fontSize: 18,
     color: '#e74c3c',
     fontWeight: 'bold',
+  },
+  headerRightButton: {
+    marginRight: 10,
   },
 });
 

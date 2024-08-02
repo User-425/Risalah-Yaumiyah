@@ -37,3 +37,7 @@ export const getContentById = (id: number): Content | undefined => {
 export const getSurahList = (): ListSurah => {
   return listSurah;
 };
+
+export const getSurahById = (id: number): SurahData | undefined => {
+  return listSurah[id.toString()];
+}

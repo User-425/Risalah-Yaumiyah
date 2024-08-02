@@ -1,12 +1,13 @@
 import React, { useState, useCallback } from 'react';
 import { View, Text, FlatList, StyleSheet, TouchableOpacity, RefreshControl } from 'react-native';
 import { getBookmarks } from '../../modules/bookmarkModule';
-import { getContentById, Content } from '../../modules/contentModule';
+import { getSurahById } from '../../modules/quranModule';
+import { getContentById} from '../../modules/contentModule';
 import { useRouter } from 'expo-router';
 import { useFocusEffect } from '@react-navigation/native';
 
 const BookmarkScreen = () => {
-  const [bookmarkedContent, setBookmarkedContent] = useState<Content[]>([]);
+  const [bookmarkedContent, setBookmarkedContent] = useState<{ id: number; type: string; title?: string }[]>([]);
   const [refreshing, setRefreshing] = useState(false);
   const router = useRouter();
 
@@ -14,7 +15,19 @@ const BookmarkScreen = () => {
     setRefreshing(true);
     try {
       const bookmarks = await getBookmarks();
-      const contentList = bookmarks.map(id => getContentById(Number(id)));
+      const contentList = await Promise.all(
+        bookmarks.map(async (bookmark) => {
+          let title: string | undefined;
+          if (bookmark.type === 'alquran') {
+            const surah = getSurahById(bookmark.id_key);
+            title = surah?.surah_name || 'No Title';
+          } else {
+            const content = getContentById(bookmark.id_key);
+            title = content?.title || 'No Title';
+          }
+          return { id: bookmark.id_key, type: bookmark.type, title };
+        })
+      );
       setBookmarkedContent(contentList);
     } catch (error) {
       console.error('Failed to fetch bookmarks:', error);
@@ -33,20 +46,26 @@ const BookmarkScreen = () => {
     fetchBookmarkedContent();
   };
 
-  const handlePress = (id: number) => {
-    router.push(`reader/${id}`);
+  const handlePress = (id: number, type: string) => {
+    if (type === 'alquran') {
+      router.push(`quran/${id}`);
+    } else {
+      router.push(`reader/${id}`);
+    }
   };
+
+  const keyExtractor = (item: { id: number }) => item.id.toString();
 
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Bookmarked</Text>
       <FlatList
         data={bookmarkedContent}
-        keyExtractor={item => item.id.toString()}
+        keyExtractor={keyExtractor}
         renderItem={({ item }) => (
-          <TouchableOpacity onPress={() => handlePress(item.id)}>
+          <TouchableOpacity onPress={() => handlePress(item.id, item.type)}>
             <View style={styles.item}>
-              <Text>{item.title}</Text>
+              <Text>{item.title || 'No Title'}</Text>
             </View>
           </TouchableOpacity>
         )}

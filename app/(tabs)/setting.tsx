@@ -1,19 +1,45 @@
 import React from 'react';
-import { StyleSheet, View, Text, ScrollView, TouchableOpacity } from 'react-native';
-import { Colors, Typography, Card, Switch, ListItem } from 'react-native-ui-lib';
+import { StyleSheet, View, Text, ScrollView, TouchableOpacity, Alert } from 'react-native';
+import { Colors, Typography, Card, Switch } from 'react-native-ui-lib';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import Header from '../../components/Header';
 import { useRouter } from 'expo-router';
+import { removeAllBookmarks } from '../../modules/bookmarkModule'; // Import the function
 
 const SettingsScreen = () => {
   const [isNotificationsEnabled, setNotificationsEnabled] = React.useState(false);
   const [isDarkModeEnabled, setDarkModeEnabled] = React.useState(false);
   
-
   const router = useRouter();
 
   const handleSelect = () => {
     router.push(`about`);
+  };
+
+  const handleRemoveAllBookmarks = async () => {
+    Alert.alert(
+      'Confirm',
+      'Are you sure you want to remove all bookmarks?',
+      [
+        {
+          text: 'Cancel',
+          style: 'cancel',
+        },
+        {
+          text: 'OK',
+          onPress: async () => {
+            try {
+              await removeAllBookmarks();
+              Alert.alert('Success', 'All bookmarks have been removed.');
+            } catch (error) {
+              Alert.alert('Error', 'An error occurred while removing bookmarks.');
+              console.error('Error removing all bookmarks:', error);
+            }
+          },
+        },
+      ],
+      { cancelable: false }
+    );
   };
 
   return (
@@ -64,6 +90,14 @@ const SettingsScreen = () => {
             </View>
             <Icon name="chevron-right" size={24} color={Colors.grey40} />
           </TouchableOpacity>
+
+          <TouchableOpacity style={styles.removeAllButton} onPress={handleRemoveAllBookmarks}>
+            <Icon name="delete" size={24} color={Colors.red30} />
+            <View style={styles.itemContent}>
+              <Text style={styles.itemTitle}>Hapus Data Bookmark</Text>
+              <Text style={styles.itemDescription}>Hapus Semua Data Bookmark</Text>
+            </View>
+          </TouchableOpacity>
         </Card>
       </ScrollView>
     </View>
@@ -86,7 +120,6 @@ const styles = StyleSheet.create({
     padding: 10,
     borderRadius: 10,
     backgroundColor: Colors.grey80,
-
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 8,
@@ -112,6 +145,14 @@ const styles = StyleSheet.create({
   itemDescription: {
     ...Typography.text80,
     color: Colors.grey40,
+  },
+  removeAllButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 15,
+    paddingHorizontal: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: Colors.grey60,
   },
 });
 

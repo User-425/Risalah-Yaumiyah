@@ -5,7 +5,7 @@ import ContentReader from '../../components/QuranReader';
 import { getContentById } from '../../modules/quranModule';
 import { useLocalSearchParams } from 'expo-router';
 import { useNavigation } from '@react-navigation/native';
-import { saveBookmark, removeBookmark, getBookmarks } from '../../modules/bookmarkModule';
+import { saveBookmark, removeBookmark, getBookmarks, ContentType } from '../../modules/bookmarkModule';
 import { Colors } from '@/constants/Colors';
 
 interface AyaData {
@@ -24,7 +24,7 @@ interface Content {
 
 const ReaderScreen = () => {
   const { id } = useLocalSearchParams();
-  const [content, setContent] = useState<AyaData[] | undefined>(undefined);
+  const [content, setContent] = useState<Content | undefined>(undefined);
   const [loading, setLoading] = useState(true);
   const [isBookmarked, setIsBookmarked] = useState(false);
   const navigation = useNavigation();
@@ -39,7 +39,7 @@ const ReaderScreen = () => {
 
       const checkBookmark = async () => {
         const bookmarks = await getBookmarks();
-        setIsBookmarked(bookmarks.includes(id));
+        setIsBookmarked(bookmarks.some(bookmark => bookmark.id === Number(id) && bookmark.type === 'alquran'));
       };
       checkBookmark();
     }
@@ -47,9 +47,9 @@ const ReaderScreen = () => {
 
   const handleBookmarkToggle = async () => {
     if (isBookmarked) {
-      await removeBookmark(id);
+      await removeBookmark(Number(id), 'alquran');
     } else {
-      await saveBookmark(id);
+      await saveBookmark(Number(id), 'alquran');
     }
     setIsBookmarked(!isBookmarked);
   };
