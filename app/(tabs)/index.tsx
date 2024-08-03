@@ -9,6 +9,7 @@ import { useRouter } from 'expo-router';
 
 import 'moment/locale/id';
 import 'moment-hijri';
+import uq from '@umalqura/core';
 
 import ContentList from '../../components/ContentList';
 import { getContentById, getContents, Content } from '../../modules/contentModule';
@@ -47,9 +48,10 @@ const Home = () => {
   useEffect(() => {
     const intervalId = setInterval(() => {
       const now = moment();
+      const hijriDate = uq(now.toDate());
       setCurrentTime(now.format('HH:mm:ss'));
       setCurrentDate(now.format('dddd, DD MMMM YYYY'));
-      setCurrentHijriDate(now.format('iYYYY/iM/iD [is] YYYY/M/D'));
+      setCurrentHijriDate(hijriDate.format('fullDate', 'ar'));
     }, 1000);
 
     return () => clearInterval(intervalId);
