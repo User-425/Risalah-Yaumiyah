@@ -1,12 +1,12 @@
 import React from 'react';
-import { View, Text, FlatList, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, FlatList, StyleSheet } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { Card, Colors, Spacings } from 'react-native-ui-lib';
 import { useNavigation } from '@react-navigation/native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { getContents, getSurahList } from '../../modules/quranModule';
 import { router } from 'expo-router';
+import { getSurahById, getContents, getSurahList } from '../../modules/quranModule';
 import Header from '../../components/Header';
+import { saveRecentlyOpened } from '../../modules/recentlyOpenedModule';
 
 interface AyaData {
   aya_id: number;
@@ -40,11 +40,10 @@ const Quran: React.FC = () => {
 
   const handleSelect = async (id: number) => {
     router.push(`quran/${id}`);
-    const selectedItem = content[id.toString()];
+    const selectedItem = getSurahById(id);
     if (selectedItem) {
-      const recentlyOpened = JSON.parse(await AsyncStorage.getItem('recentlyOpened') || '[]');
-      const updatedRecentlyOpened = [selectedItem, ...recentlyOpened.filter((item: any) => item.sura_id !== id)];
-      await AsyncStorage.setItem('recentlyOpened', JSON.stringify(updatedRecentlyOpened));
+      let title = selectedItem.surah_name;
+      await saveRecentlyOpened({ id: id, type: 'alquran', title: title});
     }
   };
 

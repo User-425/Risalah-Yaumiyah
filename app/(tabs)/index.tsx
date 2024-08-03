@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { StyleSheet, View, Text, Image, Dimensions, ScrollView, TouchableOpacity } from 'react-native';
 import { Colors, Typography, Card } from 'react-native-ui-lib';
 import Carousel from 'react-native-snap-carousel';
@@ -12,7 +11,9 @@ import 'moment/locale/id';
 import 'moment-hijri';
 
 import ContentList from '../../components/ContentList';
-import { getContents, Content } from '../../modules/contentModule';
+import { getContentById, getContents, Content } from '../../modules/contentModule';
+import { ContentType, saveRecentlyOpened, getRecentlyOpened } from '../../modules/recentlyOpenedModule';
+import { getSurahById } from '../../modules/quranModule';
 
 const { width: viewportWidth } = Dimensions.get('window');
 
@@ -28,7 +29,7 @@ const featuredIcons = [
   { title: 'Kalender', icon: 'calendar-today' },
 ];
 
-const renderCarouselItem = ({ item }) => (
+const renderCarouselItem = ({ item }: { item: { title: string; image: any } }) => (
   <View style={styles.carouselItem}>
     <Image source={item.image} style={styles.carouselImage} />
     <Text style={styles.carouselTitle}>{item.title}</Text>
@@ -39,9 +40,8 @@ const Home = () => {
   const [currentTime, setCurrentTime] = useState('');
   const [currentDate, setCurrentDate] = useState('');
   const [currentHijriDate, setCurrentHijriDate] = useState('');
-
   const [contents, setContents] = useState<Content[]>([]);
-  const [recentlyOpened, setRecentlyOpened] = useState<Content[]>([]);
+  const [recentlyOpened, setRecentlyOpened] = useState<{ id: number; type: ContentType; title: string }[]>([]);
   const router = useRouter();
 
   useEffect(() => {
@@ -49,7 +49,7 @@ const Home = () => {
       const now = moment();
       setCurrentTime(now.format('HH:mm:ss'));
       setCurrentDate(now.format('dddd, DD MMMM YYYY'));
-      setCurrentHijriDate(now.format('iYYYY/iM/iD'));
+      setCurrentHijriDate(now.format('iYYYY/iM/iD [is] YYYY/M/D'));
     }, 1000);
 
     return () => clearInterval(intervalId);
@@ -60,31 +60,61 @@ const Home = () => {
   }, []);
 
   useEffect(() => {
-    const loadRecentlyOpened = async () => {
-      const storedData = await AsyncStorage.getItem('recentlyOpened');
-      if (storedData) {
-        setRecentlyOpened(JSON.parse(storedData));
-      }
+    const fetchRecentlyOpened = async () => {
+      const items = await getRecentlyOpened();
+      setRecentlyOpened(items);
     };
 
-    loadRecentlyOpened();
+    fetchRecentlyOpened();
   }, []);
 
-  const handleSelect = async (id: number) => {
-    router.push(`reader/${id}`);
-    const selectedItem = contents.find(content => content.id === id);
-    if (selectedItem) {
-      const updatedRecentlyOpened = [selectedItem, ...recentlyOpened.filter(item => item.id !== id)];
-      setRecentlyOpened(updatedRecentlyOpened);
-      await AsyncStorage.setItem('recentlyOpened', JSON.stringify(updatedRecentlyOpened));
+  const handleRecentlyOpenedSelect = async (id: number, type: ContentType) => {
+    try {
+      let content, title;
+      if (type === 'alquran') {
+        content = await getSurahById(id);
+        title = content?.surah_name;
+      } else {
+        content = getContentById(id);
+        title = content?.title;
+      }
+
+      if (content && title) {
+        await saveRecentlyOpened({ id, type, title });
+
+        const updatedItems = await getRecentlyOpened();
+        setRecentlyOpened(updatedItems);
+
+        if (type === 'alquran') {
+          router.push(`quran/${id}`);
+        } else {
+          router.push(`reader/${id}`);
+        }
+      }
+    } catch (error) {
+      console.error("Error handling recently opened item:", error);
+    }
+  };
+
+  const handleMoreItemsSelect = async (id: number) => {
+    try {
+      const content = getContentById(id);
+      if (content) {
+        await saveRecentlyOpened({ id: content.id, type: 'other', title: content.title });
+
+        const updatedItems = await getRecentlyOpened();
+        setRecentlyOpened(updatedItems);
+
+        router.push(`reader/${id}`);
+      }
+    } catch (error) {
+      console.error("Error handling more items selection:", error);
     }
   };
 
   return (
     <View style={styles.container}>
-      <View>
-        <Header title="Beranda" />
-      </View>
+      <Header title="Beranda" />
       <ScrollView>
         <View style={styles.timeContainer}>
           <Text style={styles.timeText}>{currentTime}</Text>
@@ -110,13 +140,13 @@ const Home = () => {
         <Text style={styles.sectionTitle}>Baru Dibuka</Text>
         <ScrollView horizontal showsHorizontalScrollIndicator={false}>
           {recentlyOpened.map((item, index) => (
-            <Card key={index} style={styles.card} onPress={() => handleSelect(item.id)}>
+            <Card key={index} style={styles.card} onPress={() => handleRecentlyOpenedSelect(item.id, item.type)}>
               <Text style={styles.cardTitle}>{item.title}</Text>
             </Card>
           ))}
         </ScrollView>
         <Text style={styles.sectionTitle}>More Items</Text>
-        <ContentList contents={contents} onSelect={handleSelect} />
+        <ContentList contents={contents} onSelect={handleMoreItemsSelect} />
       </ScrollView>
     </View>
   );
