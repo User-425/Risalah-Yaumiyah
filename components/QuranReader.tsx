@@ -1,5 +1,6 @@
-import React from 'react';
-import { View, Text, StyleSheet, ScrollView } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, Text, StyleSheet, ScrollView, ActivityIndicator } from 'react-native';
+import * as Font from 'expo-font';
 import { AyaData } from '../modules/quranModule';
 
 interface ContentReaderProps {
@@ -7,6 +8,27 @@ interface ContentReaderProps {
 }
 
 const ContentReader = ({ content }: ContentReaderProps) => {
+  const [fontsLoaded, setFontsLoaded] = useState(false);
+
+  useEffect(() => {
+    const loadFonts = async () => {
+      await Font.loadAsync({
+        'LPMQ': require('../assets/fonts/LPMQ.ttf'),
+      });
+      setFontsLoaded(true);
+    };
+
+    loadFonts();
+  }, []);
+
+  if (!fontsLoaded) {
+    return (
+      <View style={styles.container}>
+        <ActivityIndicator size="large" color="#0000ff" />
+      </View>
+    );
+  }
+
   if (!content) {
     return (
       <View style={styles.container}>
@@ -47,6 +69,7 @@ const styles = StyleSheet.create({
   ayaText: {
     fontSize: 16,
     marginVertical: 5,
+    fontFamily: 'LPMQ'
   },
   translation: {
     fontSize: 14,
