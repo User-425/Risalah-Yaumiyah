@@ -8,7 +8,9 @@ const Header: React.FC<{ title: string }> = ({ title }) => {
         <View style={styles.header}>
             {/* <Icon name="menu" size={0} color={Colors.black} /> */}
             <Text style={styles.headerTitle}>{title}</Text>
-            {/* <Icon name="search" size={30} color={Colors.black} /> */}
+            {title === "Beranda" && (
+                <Icon name="search" size={30} color={Colors.black} />
+            )}
         </View>
     );
 };
