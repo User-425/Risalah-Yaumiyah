@@ -19,7 +19,6 @@ import { getSurahById } from '../../modules/quranModule';
 const { width: viewportWidth } = Dimensions.get('window');
 
 const carouselItems = [
-  { title: 'Beautiful Beach', image: require('@/assets/images/image_1.jpg') },
   { title: 'Do\'a Sehari-hari', image: require('@/assets/images/doa.jpg') },
   { title: 'Alqur\'an', image: require('@/assets/images/alquran.png') },
 ];
