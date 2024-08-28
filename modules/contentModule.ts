@@ -1,16 +1,25 @@
-import content from '../assets/data/content.json';
+import content from '../assets/data/merged_data.json';
 
 export interface Content {
-  type: string;
   id: number;
   title: string;
-  text: string;
+  arabicTitle?: string;
+  content: ContentItem[];
+  footer?: string;
+}
+
+export interface ContentItem {
+  type: string;
+  variables?: { name: string; value: string }[];
+  content: string[];
+  dir: string;
+  columns?: number;
 }
 
 export const getContents = (): Content[] => {
-  return content.map(item => ({ ...item, type: 'other' }));
+  return content;
 };
 
 export const getContentById = (id: number): Content | undefined => {
-  return content.find(item => item.id === id) as Content | undefined;
+  return content.find(item => item.id === id);
 };
